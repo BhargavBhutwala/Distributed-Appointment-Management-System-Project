@@ -1,0 +1,19 @@
+module Appointments
+{
+	interface HospInterface
+	{
+		string addAppoint(in string id, in string appointId, in string appointType, in string capacity);
+		
+		string removeAppoint(in string id, in string appointId, in string appointType);
+		
+		string listAppointAvailability(in string id, in string appointType);
+		
+		string bookAppoint(in string id, in string appointId, in string appointType);
+		
+		string cancelAppoint(in string id, in string appointId, in string appointType);
+		
+		string getBookingSchedule(in string id);
+		
+		string swapAppoint(in string id, in string newAppointId, in string newAppointType, in string oldAppointId, in string oldAppointType);
+	};
+};
