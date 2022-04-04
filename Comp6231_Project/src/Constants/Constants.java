@@ -32,7 +32,8 @@ public class Constants {
     public static final String LOCALHOST = "localhost";
     public static final String ID = "id";
     public static final String APPOINTMENT_ID = "appointId";
-    public static final String APPOINTMENT_TYPE = "appointType";
+    public static final String APPOINTMENT_TYPE = "appointType"; 
+    public static final int SEQUENCER_PORT = 5000;
     public static final String APPOINTMENT_CAPACITY = "appointCapacity";
     public static final String OLD_APPOINTMENT_ID = "oldAppointId";
     public static final String OLD_APPOINTMENT_TYPE = "oldAppointType";
