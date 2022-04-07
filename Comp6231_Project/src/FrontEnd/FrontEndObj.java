@@ -185,23 +185,23 @@ public class FrontEndObj extends FrontEndPOA {
         String id = jsonObject.get(Constants.ID).toString().trim();
         String operation = jsonObject.get(Constants.ID).toString().trim();
         if (operation.equals(Constants.ADD_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
             return operationFlag ? operationWiseJSONString(jsonString.trim())
                     : id + " Unable to perform Add Event Operation for  " + eventId;
         } else if (operation.equals(Constants.REMOVE_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
             return operationFlag ? operationWiseJSONString(jsonString.trim())
                     : id + " Unable to perform Remove Event Operation for  " + eventId;
         } else if (operation.equals(Constants.LIST_OPERATION)) {
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
             return operationFlag ? operationWiseJSONString(jsonString.trim())
                     : id + " : No Data Found or Might be data issue. " + eventType;
         } else if (operation.equals(Constants.BOOK_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
             return operationFlag ? operationWiseJSONString(jsonString.trim())
                     : id + " Unable to book  event " + eventId;
         } else if (operation.equals(Constants.CANCEL_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
             return operationFlag ? operationWiseJSONString(jsonString.trim())
                     : id + " Unable to cancel  event " + eventId;
 
@@ -228,39 +228,39 @@ public class FrontEndObj extends FrontEndPOA {
         String flag = "";
         String id = jsonObject.get(Constants.ID).toString().trim();
         if (operation.equals(Constants.ADD_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
-            String eventCapacity = jsonObject.get(Constants.EVENT_CAPACITY).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
+            String eventCapacity = jsonObject.get(Constants.APPOINTMENT_CAPACITY).toString().trim();
             flag = id + " has create event " + eventId + " of type " + eventType + " with capacity " + eventCapacity;
         } else if (operation.equals(Constants.REMOVE_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
             flag = id + " has remove event " + eventId + " of type " + eventType;
         } else if (operation.equals(Constants.LIST_OPERATION)) {
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
-            String listEvents = jsonObject.get(Constants.LIST_EVENT_AVAILABLE).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
+            String listEvents = jsonObject.get(Constants.LIST_APPOINTMENT_AVAILABLE).toString().trim();
             flag = listEvents.trim().isEmpty() ? id + " : No data found for " + eventType
                     : id + "  :  " + eventType + " = " + listEvents;
         } else if (operation.equals(Constants.BOOK_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
             flag = id + " has book event " + eventId + " of type " + eventType;
         } else if (operation.equals(Constants.CANCEL_OPERATION)) {
-            String eventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
-            String eventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
+            String eventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
+            String eventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
             flag = id + " has cancel event " + eventId + " of type " + eventType;
         } else if (operation.equals(Constants.SCHEDULE_OPERATION)) {
-            String listEvents = jsonObject.get(Constants.LIST_EVENT_SCHEDULE).toString().trim();
+            String listEvents = jsonObject.get(Constants.LIST_APPOINTMENT_SCHEDULE).toString().trim();
             flag = listEvents.trim().isEmpty() ? id + " : No data found." : id + "  :  " + listEvents;
         } else if (operation.equals(Constants.SWAP_OPERATION)) {
-            String newEventId = jsonObject.get(Constants.EVENT_ID).toString().trim();
-            String newEventType = jsonObject.get(Constants.EVENT_TYPE).toString().trim();
-            String oldEventId = jsonObject.get(Constants.OLD_EVENT_ID).toString().trim();
-            String oldEventType = jsonObject.get(Constants.OLD_EVENT_TYPE).toString().trim();
+            String newEventId = jsonObject.get(Constants.APPOINTMENT_ID).toString().trim();
+            String newEventType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString().trim();
+            String oldEventId = jsonObject.get(Constants.OLD_APPOINTMENT_ID).toString().trim();
+            String oldEventType = jsonObject.get(Constants.OLD_APPOINTMENT_TYPE).toString().trim();
             flag = id + " has swap event " + oldEventId + " of type " + oldEventType + " with " + newEventId
                     + " of type " + newEventType;
         }
         return flag.trim().equals("") ? id + " : No Data Found or Might be data issue. Please try again" : flag;
     }
 }
-}
+
