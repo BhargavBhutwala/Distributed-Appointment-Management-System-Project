@@ -7,22 +7,22 @@ import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import org.json.simple.JSONObject;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 import org.omg.CosNaming.NamingContextPackage.CannotProceed;
 import org.omg.CosNaming.NamingContextPackage.InvalidName;
 import org.omg.CosNaming.NamingContextPackage.NotFound;
-
-import Appointments.HospInterface;
-import Appointments.HospInterfaceHelper;
-
+import Constants.Constants;
+import app.FrontEndHelper;
+import  app.FrontEnd;
 public class Client
 {
     static BufferedReader br;
     static Logger logger;
     static FileHandler fh;
-    static HospInterface obj;
+    static FrontEnd obj;
 
     public static void main(String[] args)
     {
@@ -77,7 +77,8 @@ public class Client
         else if(option.equals("2"))
         {
             logger.info("List appointment operation");
-            logger.info(obj.getBookingSchedule(id));
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, Constants.NONE, Constants.NONE, Constants.NONE,
+                    Constants.NONE, Constants.NONE, Constants.SCHEDULE_OPERATION)));
         }
         else if(option.equals("3"))
         {
@@ -103,7 +104,9 @@ public class Client
         System.out.println("4. Old Appointment Type");
         String oldAppointType = br.readLine().trim();
         if ((newAppointId.charAt(3)=='M'||newAppointId.charAt(3)=='A'||newAppointId.charAt(3)=='E')&&(oldAppointId.charAt(3)=='M'||oldAppointId.charAt(3)=='A'||oldAppointId.charAt(3)=='E')){
-            logger.info(obj.swapAppoint(id, newAppointId, newAppointType,oldAppointId,oldAppointType));
+            logger.info( obj.sendRequestToSequencer(generateJSONObject(customerId, newEventId, newEventType, Constants.NONE, oldEventId,
+                    oldEventType, Constants.SWAP_OPERATION)));
+
         }
         else {
             logger.info("Please Enter proper appointment Id");
@@ -148,7 +151,8 @@ public class Client
             System.out.println("Enter patient id:");
             String patientId=br.readLine();
             logger.info(id+" Get booking schedule");
-            logger.info(obj.getBookingSchedule(patientId));
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, Constants.NONE, Constants.NONE, Constants.NONE,
+                    Constants.NONE, Constants.NONE, Constants.SCHEDULE_OPERATION)));
         }
         else if(option.equals("6"))
         {
@@ -174,7 +178,8 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.cancelAppoint(id, appointId, appointType));
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, eventId, eventType, Constants.NONE, Constants.NONE,
+                    Constants.NONE, Constants.CANCEL_OPERATION)));
         }
         else {
             logger.info("Please Enter proper appointment Id");
@@ -189,7 +194,8 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.bookAppoint(id, appointId, appointType));
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, eventId, eventType, Constants.NONE, Constants.NONE,
+                    Constants.NONE, Constants.BOOK_OPERATION)));
         }
         else {
             logger.info("Please Enter proper appointment Id");
@@ -201,7 +207,8 @@ public class Client
         // TODO Auto-generated method stub
         System.out.println("1. Appointment Type");
         String appointType = br.readLine().trim();
-        logger.info(obj.listAppointAvailability(id, appointType));
+        logger.info(obj.sendRequestToSequencer(generateJSONObject(managerId, Constants.NONE, eventType, Constants.NONE, Constants.NONE,
+                Constants.NONE, Constants.LIST_OPERATION)));
 
     }
 
@@ -212,7 +219,8 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.removeAppoint(id, appointId, appointType));
+            logger.info(obj.sendRequestToSequencer( generateJSONObject(managerId, eventId, eventType, Constants.NONE, Constants.NONE,
+                    Constants.NONE, Constants.REMOVE_OPERATION)));
         }
         else {
             logger.info("Please Enter proper appointment Id");
@@ -229,7 +237,8 @@ public class Client
         System.out.println("3. Booking Capacity");
         String capacity = br.readLine().trim();
         if ((Integer.parseInt(capacity.trim())>=0)&&(appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E')){
-            logger.info(obj.addAppoint(id, appointId, appointType, capacity));
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(managerId, eventId, eventType, eventCapacity, Constants.NONE,
+                    Constants.NONE, Constants.ADD_OPERATION)));
         }
         else {
             logger.info("Please Enter proper appointment Id or event capacity");
@@ -251,7 +260,7 @@ public class Client
         {
             obj= HospInterfaceHelper.narrow(ncRef.resolve_str("SHE"));
         }**/
-       obj=HospInterfaceHelper.narrow(ncRef.resolve_str("FrontEnd"));
+       obj=FrontEndHelper.narrow(ncRef.resolve_str("FE"));
 
     }
 
@@ -270,6 +279,18 @@ public class Client
             logger.info("Couldn't Initiate Logger. Please check file permission");
         }
 
+    }
+    static String generateJSONObject(String id, String eventId, String eventType, String eventCapacity,
+                                     String oldEventId, String oldEventType, String operation) {
+        JSONObject obj = new JSONObject();
+        obj.put(Constants.ID, id.trim());
+        obj.put(Constants.APPOINTMENT_ID ,eventId.trim());
+        obj.put(Constants.APPOINTMENT_TYPE, eventType.trim());
+        obj.put(Constants.APPOINTMENT_CAPACITY, eventCapacity.trim());
+        obj.put(Constants.OLD_APPOINTMENT_ID, oldEventId.trim());
+        obj.put(Constants.OLD_APPOINTMENT_TYPE, oldEventType.trim());
+        obj.put(Constants.OPERATION, operation.trim());
+        return obj.toString();
     }
 }
 

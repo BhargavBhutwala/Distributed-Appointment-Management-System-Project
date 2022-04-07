@@ -7,7 +7,9 @@ public class Constants {
     public static final String FAIL_RM3_IP="132.205.95.133";
     public static final String MULTICAST_IP="230.0.0.0";
     public static final int RM_FRONTEND_PORT=9990;
-    public static final int RM1_FRONTEND_PORT=9990;
+    public static final int RM1_FRONTEND_PORT=9991;
+    public static final int RM2_FRONTEND_PORT=9992;
+    public static final int RM3_FRONTEND_PORT=9993;
     public static final int FAULT_PORT=6467;
     public static final String FAULT_MULTICAST_IP="230.2.2.5";
     public static final int BYTE_LENGTH=65535;
