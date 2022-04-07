@@ -77,7 +77,7 @@ public class Client
         else if(option.equals("2"))
         {
             logger.info("List appointment operation");
-            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, Constants.NONE, Constants.NONE, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(id, Constants.NONE, Constants.NONE, Constants.NONE,
                     Constants.NONE, Constants.NONE, Constants.SCHEDULE_OPERATION)));
         }
         else if(option.equals("3"))
@@ -104,8 +104,8 @@ public class Client
         System.out.println("4. Old Appointment Type");
         String oldAppointType = br.readLine().trim();
         if ((newAppointId.charAt(3)=='M'||newAppointId.charAt(3)=='A'||newAppointId.charAt(3)=='E')&&(oldAppointId.charAt(3)=='M'||oldAppointId.charAt(3)=='A'||oldAppointId.charAt(3)=='E')){
-            logger.info( obj.sendRequestToSequencer(generateJSONObject(customerId, newEventId, newEventType, Constants.NONE, oldEventId,
-                    oldEventType, Constants.SWAP_OPERATION)));
+            logger.info( obj.sendRequestToSequencer(generateJSONObject(id, newAppointId, newAppointType, Constants.NONE, oldAppointId,
+                    oldAppointType, Constants.SWAP_OPERATION)));
 
         }
         else {
@@ -151,7 +151,7 @@ public class Client
             System.out.println("Enter patient id:");
             String patientId=br.readLine();
             logger.info(id+" Get booking schedule");
-            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, Constants.NONE, Constants.NONE, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(id, Constants.NONE, Constants.NONE, Constants.NONE,
                     Constants.NONE, Constants.NONE, Constants.SCHEDULE_OPERATION)));
         }
         else if(option.equals("6"))
@@ -178,7 +178,7 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, eventId, eventType, Constants.NONE, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(id, appointId, appointType, Constants.NONE, Constants.NONE,
                     Constants.NONE, Constants.CANCEL_OPERATION)));
         }
         else {
@@ -194,7 +194,7 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.sendRequestToSequencer(generateJSONObject(customerId, eventId, eventType, Constants.NONE, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(id, appointId, appointType, Constants.NONE, Constants.NONE,
                     Constants.NONE, Constants.BOOK_OPERATION)));
         }
         else {
@@ -207,7 +207,7 @@ public class Client
         // TODO Auto-generated method stub
         System.out.println("1. Appointment Type");
         String appointType = br.readLine().trim();
-        logger.info(obj.sendRequestToSequencer(generateJSONObject(managerId, Constants.NONE, eventType, Constants.NONE, Constants.NONE,
+        logger.info(obj.sendRequestToSequencer(generateJSONObject(id, Constants.NONE, appointType, Constants.NONE, Constants.NONE,
                 Constants.NONE, Constants.LIST_OPERATION)));
 
     }
@@ -219,7 +219,7 @@ public class Client
         System.out.println("2. Appointment Type");
         String appointType = br.readLine().trim();
         if (appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E'){
-            logger.info(obj.sendRequestToSequencer( generateJSONObject(managerId, eventId, eventType, Constants.NONE, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer( generateJSONObject(id, appointId, appointType, Constants.NONE, Constants.NONE,
                     Constants.NONE, Constants.REMOVE_OPERATION)));
         }
         else {
@@ -237,7 +237,7 @@ public class Client
         System.out.println("3. Booking Capacity");
         String capacity = br.readLine().trim();
         if ((Integer.parseInt(capacity.trim())>=0)&&(appointId.charAt(3)=='M'||appointId.charAt(3)=='A'||appointId.charAt(3)=='E')){
-            logger.info(obj.sendRequestToSequencer(generateJSONObject(managerId, eventId, eventType, eventCapacity, Constants.NONE,
+            logger.info(obj.sendRequestToSequencer(generateJSONObject(id, appointId, appointType, capacity, Constants.NONE,
                     Constants.NONE, Constants.ADD_OPERATION)));
         }
         else {
