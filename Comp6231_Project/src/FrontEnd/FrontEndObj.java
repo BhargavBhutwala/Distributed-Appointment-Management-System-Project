@@ -104,6 +104,11 @@ public class FrontEndObj extends FrontEndPOA {
         response[1] = responseQueue.get(id)[1];
         response[2] = responseQueue.get(id)[2];
 
+        if(response[0] == null || response[1] == null || response[2] == null){
+            logger.info("received null response");
+            return "";
+        }
+
         if (response[0].equals(response[1])) {
             if (response[0].equals(response[2])) {
                 logger.info("Response Received with no bugged Response " + response[0] + response[1] + response[2]);
@@ -154,7 +159,7 @@ public class FrontEndObj extends FrontEndPOA {
     private void rmResponse(int port) {
         DatagramSocket socket = null;
         try {
-            logger.info("rresponse listenin for port"+port);
+            logger.info("Response listenin for port"+port);
             socket = new DatagramSocket(port);
             byte[] buf = new byte[1000];
             while (true) {
@@ -163,21 +168,22 @@ public class FrontEndObj extends FrontEndPOA {
                 socket.receive(packet);
                 String data1 = new String(packet.getData(), 0, packet.getLength());
                 logger.info(data1);
-                String data2 = unpackJSON(data1);
-                String[] data = data2.split(":");
-                String[] r = responseQueue.get(Long.parseLong(data[0]));
+                String[] data2 = data1.split(":");
+                logger.info("Sequence          "+data2[0]+"    Response         " + data2[1]);
+                String data = unpackJSON(data2[1]);
+                String[] r = responseQueue.get((int)Long.parseLong(data2[0]));
                 if (port == ports[0]) {
-                    r[0] = data[1];
-                    responseQueue.replace(Integer.parseInt(data[0]),r);
-                    logger.info("RM 1 : " + r[0]);
+                    r[0] = data;
+                    responseQueue.replace(Integer.parseInt(data2[0]),r);
+                    //logger.info("RM 1 : " + r[0]);
                 } else if (port == ports[1]) {
-                    r[1] = data[1];
-                    responseQueue.replace(Integer.parseInt(data[0]),r);
-                    logger.info("RM 2 : " + r[1]);
+                    r[1] = data;
+                    responseQueue.replace(Integer.parseInt(data2[0]),r);
+                    //logger.info("RM 2 : " + r[1]);
                 } else {
-                    r[2] = data[1];
-                    responseQueue.replace(Integer.parseInt(data[0]),r);
-                    logger.info("RM 3 : " + r[2]);
+                    r[2] = data;
+                    responseQueue.replace(Integer.parseInt(data2[0]),r);
+                  //  logger.info("RM 3 : " + r[2]);
                 }
             }
         } catch (Exception ex) {

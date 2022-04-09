@@ -345,7 +345,7 @@ public class Montreal_Server {
                     }
                 }
                 updateJSONFile();
-                sendRequestToFrontEnd(counter +":"+output);
+                sendRequestToFrontEnd(counter +"|"+output);
             }
         } catch (IOException e) {
             e.printStackTrace();
