@@ -25,7 +25,7 @@ public class Quebec_Server {
 
     public static void main(String[] args) throws Exception{
         Quebec_Server quebec_server=new Quebec_Server();
-        Quebec_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_Project\\logs\\QUE.txt","QUE");
+        Quebec_Server.setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\QUE.txt","QUE");
         logger.info("Quebec server started...");
         Runnable qtask=()->{
             quebec_server.receive();
@@ -196,32 +196,7 @@ public class Quebec_Server {
                 String[] data=new String(dp.getData()).trim().split(",");
                 logger.info(data[1].trim()+" is sending data to "+data[2].trim());
                 if (data[1].trim().equals(Constants.RM1_ID)){
-                    if (data[2].trim().equals(Constants.RM1_ID)){
-                        ds=new DatagramSocket();
-                        JSONParser parser=new JSONParser();
-                        Object obj=parser.parse(new FileReader("montreal.json"));
-                        JSONObject jsonObject=(JSONObject) obj;
-                        String mtlData=jsonObject.toString();
-                        obj=parser.parse(new FileReader("quebec.json"));
-                        jsonObject=(JSONObject) obj;
-                        String queData=jsonObject.toString();
-                        obj=parser.parse(new FileReader("sherbrook.json"));
-                        jsonObject=(JSONObject) obj;
-                        String sheData=jsonObject.toString();
-                        byte[] mtlByte=mtlData.getBytes();
-                        byte[] queByte=queData.getBytes();
-                        byte[] sheByte=sheData.getBytes();
-                        InetAddress mtlHost=InetAddress.getByName(Constants.FAIL_RM1_IP);
-                        DatagramPacket mtlRequest=new DatagramPacket(mtlByte,mtlByte.length,mtlHost,Constants.FAIL_Montreal_PORT);
-                        ds.send(mtlRequest);
-                        InetAddress queHost=InetAddress.getByName(Constants.FAIL_RM1_IP);
-                        DatagramPacket queRequest=new DatagramPacket(queByte,queByte.length,queHost,Constants.FAIL_Quebec_PORT);
-                        ds.send(queRequest);
-                        InetAddress sheHost=InetAddress.getByName(Constants.FAIL_RM1_IP);
-                        DatagramPacket sheRequest=new DatagramPacket(sheByte,sheByte.length,sheHost,Constants.FAIL_Sherbrook_PORT);
-                        ds.send(sheRequest);
-                    }
-                    else if (data[2].trim().equals(Constants.RM2_ID)){
+                    if (data[2].trim().equals(Constants.RM2_ID)){
                         ds=new DatagramSocket();
                         JSONParser parser=new JSONParser();
                         Object obj=parser.parse(new FileReader("montreal.json"));
@@ -292,6 +267,10 @@ public class Quebec_Server {
                 String request=new String(datagramPacket.getData());
                 Object object=new JSONParser().parse(request.trim());
                 JSONObject jsonObject=(JSONObject) object;
+                long counter = (long) jsonObject.get("Sequence");
+
+
+
                 switch (jsonObject.get(Constants.OPERATION).toString()){
                     case "addAppointment":{
                         String id=jsonObject.get(Constants.ID).toString();
@@ -344,7 +323,7 @@ public class Quebec_Server {
                     }
                 }
                 updateJSONFile();
-                sendRequestToFrontEnd(output);
+                sendRequestToFrontEnd(counter +":"+output);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -364,7 +343,7 @@ public class Quebec_Server {
             datagramSocket=new DatagramSocket();
             byte[] buffer=data.getBytes();
             InetAddress inetAddress=InetAddress.getByName(Constants.FRONTEND_IP);
-            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM_FRONTEND_PORT);
+            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM1_FRONTEND_PORT);
             datagramSocket.send(datagramPacket);
         } catch (SocketException e) {
             e.printStackTrace();

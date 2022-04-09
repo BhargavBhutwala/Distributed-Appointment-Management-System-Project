@@ -25,7 +25,7 @@ public class Montreal_Server {
 
     public static void main(String[] args) throws Exception{
         Montreal_Server montreal_server=new Montreal_Server();
-        Montreal_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_Project\\logs\\MTL.txt","MTL");
+        Montreal_Server.setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\MTL.txt","MTL");
         logger.info("Montreal server started...");
         Runnable mtask=()->{
             montreal_server.receive();
@@ -292,6 +292,7 @@ public class Montreal_Server {
                 String request=new String(datagramPacket.getData());
                 Object object=new JSONParser().parse(request.trim());
                 JSONObject jsonObject=(JSONObject) object;
+                long counter = (long) jsonObject.get("Sequence");
                 switch (jsonObject.get(Constants.OPERATION).toString()){
                     case "addAppointment":{
                         String id=jsonObject.get(Constants.ID).toString();
@@ -344,7 +345,7 @@ public class Montreal_Server {
                     }
                 }
                 updateJSONFile();
-                sendRequestToFrontEnd(output);
+                sendRequestToFrontEnd(counter +":"+output);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -364,7 +365,7 @@ public class Montreal_Server {
             datagramSocket=new DatagramSocket();
             byte[] buffer=data.getBytes();
             InetAddress inetAddress=InetAddress.getByName(Constants.FRONTEND_IP);
-            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM_FRONTEND_PORT);
+            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM1_FRONTEND_PORT);
             datagramSocket.send(datagramPacket);
         } catch (SocketException e) {
             e.printStackTrace();

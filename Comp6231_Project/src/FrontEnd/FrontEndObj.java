@@ -8,7 +8,10 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -21,8 +24,7 @@ public class FrontEndObj extends FrontEndPOA {
         this.sequencerPort = Constants.SEQUENCER_PORT;
         ports = new int[]{Constants.RM1_FRONTEND_PORT, Constants.RM2_FRONTEND_PORT, Constants.RM3_FRONTEND_PORT};
         fault_Port = Constants.FAULT_PORT;
-        setLogger("logs/FrontEnd.txt", "FrontEnd");
-        response = new String[]{"", "", ""};
+        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\FrontEnd.txt", "FrontEnd");
         failures = new int[]{0, 0, 0};
         new Thread(() -> {
             rmResponse(ports[0]);
@@ -34,47 +36,77 @@ public class FrontEndObj extends FrontEndPOA {
             rmResponse(ports[2]);
         }).start();
     }
-
+    static long counter = 1;
     private final int[] ports;
     static Logger logger;
     private final int fault_Port;
-    private String[] response;
     private int[] failures;
+    static HashMap<Integer, String[]> responseQueue;
+    static{
+        responseQueue = new HashMap<>();
+    }
 
     @Override
     public String sendRequestToSequencer(String request) {
         // logger.log("here");
         String majorResponse = "";
-        try {
 
-            byte[] buf = request.getBytes();
-            DatagramSocket socket = new DatagramSocket();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("localhost"), this.sequencerPort);
-            socket.send(packet);
+        try {
+            int id = 0;
+            DatagramSocket aSocket = new DatagramSocket(Constants.SEQUENCER_PORT);
+            Object obj = new JSONParser().parse(request);
+            JSONObject jsonObject = (JSONObject) obj;
+            jsonObject.put("Sequence", counter);
+            logger.info("Sequencer Data : " + jsonObject.toString());
+            responseQueue.put((int) counter,new String[3]);
+            synchronized (this) {
+                id = (int) counter;
+                counter++;
+            }
+            InetAddress aHost = InetAddress.getByName(Constants.MULTICAST_IP);
+            byte[] msg = jsonObject.toString().getBytes();
+            if (jsonObject.get(Constants.ID).toString().subSequence(0, 3).equals("MTL")) {
+                DatagramPacket packet = new DatagramPacket(msg, msg.length, aHost, Constants.RM_Montreal_PORT);
+                aSocket.send(packet);
+            } else if (jsonObject.get(Constants.ID).toString().subSequence(0, 3).equals("QUE")) {
+                DatagramPacket packet = new DatagramPacket(msg, msg.length, aHost, Constants.RM_Quebec_PORT);
+                aSocket.send(packet);
+            } else if (jsonObject.get(Constants.ID).toString().subSequence(0, 3).equals("SHE")) {
+                DatagramPacket packet = new DatagramPacket(msg, msg.length, aHost, Constants.RM_Sherbrook_PORT);
+                aSocket.send(packet);
+            }
             logger.info("waiting for response...");
             try {
-                Thread.sleep(3000);
+                Thread.sleep(10000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             //Getting Major Response
-            majorResponse = udpRely();
+            majorResponse = udpRely(id);
 
         } catch (SocketException ex) {
             ex.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         return majorResponse;
 
     }
 
-    private String udpRely() {
+    private String udpRely(int id) {
         String majorResponse = "";
+
+        String[] response = new String[3];
+        response[0] = responseQueue.get(id)[0];
+        response[1] = responseQueue.get(id)[1];
+        response[2] = responseQueue.get(id)[2];
 
         if (response[0].equals(response[1])) {
             if (response[0].equals(response[2])) {
+                logger.info("Response Received with no bugged Response " + response[0] + response[1] + response[2]);
                 return response[0];
             }
         }
@@ -115,29 +147,37 @@ public class FrontEndObj extends FrontEndPOA {
                 failures[0] = 0;
             }
         }
-
+        logger.info("Response Received" + response[0] + response[1] + response[2]);
         return majorResponse;
     }
 
     private void rmResponse(int port) {
         DatagramSocket socket = null;
         try {
+            logger.info("rresponse listenin for port"+port);
             socket = new DatagramSocket(port);
             byte[] buf = new byte[1000];
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                logger.info(String.valueOf(port));
                 socket.receive(packet);
                 String data1 = new String(packet.getData(), 0, packet.getLength());
-                String data = unpackJSON(data1);
+                logger.info(data1);
+                String data2 = unpackJSON(data1);
+                String[] data = data2.split(":");
+                String[] r = responseQueue.get(Long.parseLong(data[0]));
                 if (port == ports[0]) {
-                    response[0] = data;
-                    logger.info("RM 1 : " + response[0]);
+                    r[0] = data[1];
+                    responseQueue.replace(Integer.parseInt(data[0]),r);
+                    logger.info("RM 1 : " + r[0]);
                 } else if (port == ports[1]) {
-                    response[1] = data;
-                    logger.info("RM 2 : " + response[1]);
+                    r[1] = data[1];
+                    responseQueue.replace(Integer.parseInt(data[0]),r);
+                    logger.info("RM 2 : " + r[1]);
                 } else {
-                    response[2] = data;
-                    logger.info("RM 3 : " + response[2]);
+                    r[2] = data[1];
+                    responseQueue.replace(Integer.parseInt(data[0]),r);
+                    logger.info("RM 3 : " + r[2]);
                 }
             }
         } catch (Exception ex) {
@@ -153,7 +193,7 @@ public class FrontEndObj extends FrontEndPOA {
             String request = msg + ":RM" + Integer.toString(handlePort) + ":RM" + Integer.toString(port);
             byte[] buf = request.getBytes();
             DatagramSocket socket = new DatagramSocket();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(Constants.MULTICAST_IP), this.fault_Port);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(Constants.FAULT_MULTICAST_IP), this.fault_Port);
             socket.send(packet);
         } catch (SocketException | UnknownHostException ex) {
             ex.printStackTrace();

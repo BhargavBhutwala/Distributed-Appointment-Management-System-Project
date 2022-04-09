@@ -29,7 +29,7 @@ public class HospSherbrookManager {
     public HospSherbrookManager(){
         super();
         s_data=new Sherbrook_Data();
-        setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231Assignment2\\logs\\SHE\\SHE.txt","SHE");
+        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\SHE\\SHE.txt","SHE");
     }
     public String addAppoint(String id, String appointId, String appointType, String capacity)
     {
