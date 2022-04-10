@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.*;
+import java.util.HashMap;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -22,6 +23,8 @@ public class Sherbrook_Server {
     static HospSherbrookManager she=new HospSherbrookManager();
     static Logger logger;
     String output="";
+    private long counter_s = 1;
+    private HashMap<Long,String> q = new HashMap<>();
 
     public static void main(String[] args) throws Exception{
         Sherbrook_Server sherbrook_server=new Sherbrook_Server();
@@ -279,83 +282,120 @@ public class Sherbrook_Server {
             e.printStackTrace();
         }
     }
-
     private void receiveMulticastRequest() {
-        MulticastSocket multicastSocket=null;
+        MulticastSocket multicastSocket = null;
         try {
-            multicastSocket=new MulticastSocket(Constants.RM_Sherbrook_PORT);
+            multicastSocket = new MulticastSocket(Constants.RM_Montreal_PORT);
             multicastSocket.joinGroup(InetAddress.getByName(Constants.MULTICAST_IP));
-            while (true){
+            while (true) {
                 byte[] buffer = new byte[65535];
-                DatagramPacket datagramPacket=new DatagramPacket(buffer, buffer.length);
+                DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
                 multicastSocket.receive(datagramPacket);
-                String request=new String(datagramPacket.getData());
-                Object object=new JSONParser().parse(request.trim());
-                JSONObject jsonObject=(JSONObject) object;
+
+                String request = new String(datagramPacket.getData());
+                Object object = new JSONParser().parse(request.trim());
+                JSONObject jsonObject = (JSONObject) object;
                 long counter = (long) jsonObject.get("Sequence");
-                switch (jsonObject.get(Constants.OPERATION).toString()){
-                    case "addAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String appointId=jsonObject.get(Constants.APPOINTMENT_ID).toString();
-                        String appointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        String capacity=jsonObject.get(Constants.APPOINTMENT_CAPACITY).toString();
-                        output=she.addAppoint(id,appointId,appointType,capacity);
-                        break;
-                    }
-                    case "removeAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String appointId=jsonObject.get(Constants.APPOINTMENT_ID).toString();
-                        String appointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        output=she.removeAppoint(id,appointId,appointType);
-                        break;
-                    }
-                    case "listAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String appointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        output=she.listAppointAvailability(id,appointType);
-                        break;
-                    }
-                    case "bookAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String appointId=jsonObject.get(Constants.APPOINTMENT_ID).toString();
-                        String appointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        output=she.bookAppoint(id,appointId,appointType);
-                        break;
-                    }
-                    case "cancelAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String appointId=jsonObject.get(Constants.APPOINTMENT_ID).toString();
-                        String appointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        output=she.cancelAppoint(id,appointId,appointType);
-                        break;
-                    }
-                    case "scheduleAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        output=she.getBookingSchedule(id);
-                        break;
-                    }
-                    case "swapAppointment":{
-                        String id=jsonObject.get(Constants.ID).toString();
-                        String newAppointId=jsonObject.get(Constants.APPOINTMENT_ID).toString();
-                        String newAppointType=jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
-                        String oldAppointId=jsonObject.get(Constants.OLD_APPOINTMENT_ID).toString();
-                        String oldAppointType=jsonObject.get(Constants.OLD_APPOINTMENT_TYPE).toString();
-                        output=she.swapAppoint(id,newAppointId,newAppointType,oldAppointId,oldAppointType);
-                        break;
-                    }
+                if(counter == counter_s) {
+                    execute(request, counter);
+                    counter_s++;
+                    new Thread(
+                            ()->{
+                                try {
+                                    Q(counter);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }).start();
                 }
-                updateJSONFile();
-                sendRequestToFrontEnd(counter +"|"+output);
+                else
+                {
+                    q.put(counter,request);
+                }
             }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
+        }finally {
+            multicastSocket.close();
         }
-        finally {
-            if (multicastSocket!=null)
-                multicastSocket.close();
+
+    }
+
+    private void Q(long counter) throws ParseException {
+
+        if(q.containsKey(counter)) {
+            String request = q.get(counter);
+
+            execute(request, counter);
+            q.remove(counter);
+            counter_s++;
+            Q(counter);
         }
+
+
+    }
+
+    private void execute(String request, long counter) throws ParseException {
+        Object object = new JSONParser().parse(request.trim());
+        JSONObject jsonObject = (JSONObject) object;
+        switch (jsonObject.get(Constants.OPERATION).toString()) {
+            case "addAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String appointId = jsonObject.get(Constants.APPOINTMENT_ID).toString();
+                String appointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                String capacity = jsonObject.get(Constants.APPOINTMENT_CAPACITY).toString();
+                output = she.addAppoint(id, appointId, appointType, capacity);
+                break;
+            }
+            case "removeAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String appointId = jsonObject.get(Constants.APPOINTMENT_ID).toString();
+                String appointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                output = she.removeAppoint(id, appointId, appointType);
+                break;
+            }
+            case "listAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String appointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                output = she.listAppointAvailability(id, appointType);
+                break;
+            }
+            case "bookAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String appointId = jsonObject.get(Constants.APPOINTMENT_ID).toString();
+                String appointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                output = she.bookAppoint(id, appointId, appointType);
+                break;
+            }
+            case "cancelAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String appointId = jsonObject.get(Constants.APPOINTMENT_ID).toString();
+                String appointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                output = she.cancelAppoint(id, appointId, appointType);
+                break;
+            }
+            case "scheduleAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                output = she.getBookingSchedule(id);
+                break;
+            }
+            case "swapAppointment": {
+                String id = jsonObject.get(Constants.ID).toString();
+                String newAppointId = jsonObject.get(Constants.APPOINTMENT_ID).toString();
+                String newAppointType = jsonObject.get(Constants.APPOINTMENT_TYPE).toString();
+                String oldAppointId = jsonObject.get(Constants.OLD_APPOINTMENT_ID).toString();
+                String oldAppointType = jsonObject.get(Constants.OLD_APPOINTMENT_TYPE).toString();
+                output = she.swapAppoint(id, newAppointId, newAppointType, oldAppointId, oldAppointType);
+                break;
+            }
+        }
+        updateJSONFile();
+        sendRequestToFrontEnd(counter + "#" + output);
+
     }
 
     private void sendRequestToFrontEnd(String data) {

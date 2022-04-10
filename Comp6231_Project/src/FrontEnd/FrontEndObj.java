@@ -168,7 +168,7 @@ public class FrontEndObj extends FrontEndPOA {
                 socket.receive(packet);
                 String data1 = new String(packet.getData(), 0, packet.getLength());
                 logger.info(data1);
-                String[] data2 = data1.split(":");
+                String[] data2 = data1.split("#");
                 logger.info("Sequence          "+data2[0]+"    Response         " + data2[1]);
                 String data = unpackJSON(data2[1]);
                 String[] r = responseQueue.get((int)Long.parseLong(data2[0]));
