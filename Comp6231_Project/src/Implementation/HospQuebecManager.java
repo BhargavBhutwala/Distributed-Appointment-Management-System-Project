@@ -28,7 +28,7 @@ public class HospQuebecManager {
     public HospQuebecManager(){
         super();
         q_data=new Quebec_Data();
-        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\QUE\\QUE.txt","QUE");
+        setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\QUE\\QUE.txt","QUE");
     }
     public String addAppoint(String id, String appointId, String appointType, String capacity)
     {
@@ -446,7 +446,7 @@ public class HospQuebecManager {
         jsonObject.put(Constants.OLD_APPOINTMENT_ID,oldAppointId.trim());
         jsonObject.put(Constants.OLD_APPOINTMENT_TYPE,oldAppointType.trim());
         jsonObject.put(Constants.OPERATION,operation.trim());
-        jsonObject.put(Constants.OPERATION_STATUS,operation.trim());
+        jsonObject.put(Constants.OPERATION_STATUS,status);
         return jsonObject.toString();
     }
 

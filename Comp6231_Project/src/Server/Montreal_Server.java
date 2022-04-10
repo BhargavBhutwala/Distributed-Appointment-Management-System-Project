@@ -28,7 +28,7 @@ public class Montreal_Server {
 
     public static void main(String[] args) throws Exception{
         Montreal_Server montreal_server=new Montreal_Server();
-        Montreal_Server.setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\MTL.txt","MTL");
+        Montreal_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\MTL.txt","MTL");
         logger.info("Montreal server started...");
         Runnable mtask=()->{
             montreal_server.receive();
@@ -198,7 +198,7 @@ public class Montreal_Server {
                 msocket.receive(dp);
                 String[] data=new String(dp.getData()).trim().split(",");
                 logger.info(data[1].trim()+" is sending data to "+data[2].trim());
-                if (data[1].trim().equals(Constants.RM1_ID)){
+                if (data[1].trim().equals(Constants.RM2_ID)){
                     if (data[2].trim().equals(Constants.RM1_ID)){
                         ds=new DatagramSocket();
                         JSONParser parser=new JSONParser();
@@ -408,7 +408,7 @@ public class Montreal_Server {
             datagramSocket=new DatagramSocket();
             byte[] buffer=data.getBytes();
             InetAddress inetAddress=InetAddress.getByName(Constants.FRONTEND_IP);
-            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM1_FRONTEND_PORT);
+            DatagramPacket datagramPacket=new DatagramPacket(buffer,buffer.length,inetAddress,Constants.RM2_FRONTEND_PORT);
             datagramSocket.send(datagramPacket);
         } catch (SocketException e) {
             e.printStackTrace();
