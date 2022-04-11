@@ -24,7 +24,7 @@ public class FrontEndObj extends FrontEndPOA {
         this.sequencerPort = Constants.SEQUENCER_PORT;
         ports = new int[]{Constants.RM1_FRONTEND_PORT, Constants.RM2_FRONTEND_PORT, Constants.RM3_FRONTEND_PORT};
         fault_Port = Constants.FAULT_PORT;
-        setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\FrontEnd.txt", "FrontEnd");
+        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\FrontEnd.txt", "FrontEnd");
         failures = new int[]{0, 0, 0};
         new Thread(() -> {
             rmResponse(ports[0]);
@@ -53,16 +53,16 @@ public class FrontEndObj extends FrontEndPOA {
 
         try {
             int id = 0;
-            DatagramSocket aSocket = new DatagramSocket(Constants.SEQUENCER_PORT);
+            DatagramSocket aSocket = new DatagramSocket();
             Object obj = new JSONParser().parse(request);
             JSONObject jsonObject = (JSONObject) obj;
             jsonObject.put("Sequence", counter);
-            logger.info("Sequencer Data : " + jsonObject.toString());
             responseQueue.put((int) counter,new String[3]);
             synchronized (this) {
                 id = (int) counter;
                 counter++;
             }
+
             InetAddress aHost = InetAddress.getByName(Constants.MULTICAST_IP);
             byte[] msg = jsonObject.toString().getBytes();
             if (jsonObject.get(Constants.ID).toString().subSequence(0, 3).equals("MTL")) {
@@ -77,7 +77,7 @@ public class FrontEndObj extends FrontEndPOA {
             }
             logger.info("waiting for response...");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(3000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -111,19 +111,10 @@ public class FrontEndObj extends FrontEndPOA {
 
         if (response[0].equals(response[1])) {
             if (response[0].equals(response[2])) {
-                logger.info("Response Received with no bugged Response " + response[0] + response[1] + response[2]);
+                logger.info("Response Received with no bugged Response ");
                 return response[0];
             }
         }
-//        if (response[0].equals("")) {
-//            sendFailure("Server Crash", 2, 1);
-//        }
-//        if (response[1].equals("")) {
-//            sendFailure("Server Crash", 1, 2);
-//        }
-//        if (response[2].equals("")) {
-//            sendFailure("Server Crash", 2, 3);
-//        }
 
         if (response[0].equals(response[1])) {
             majorResponse = response[0];
@@ -152,7 +143,7 @@ public class FrontEndObj extends FrontEndPOA {
                 failures[0] = 0;
             }
         }
-        logger.info("Response Received" + response[0] + response[1] + response[2]);
+        logger.info("Response Received");
         return majorResponse;
     }
 
@@ -167,23 +158,21 @@ public class FrontEndObj extends FrontEndPOA {
                 logger.info(String.valueOf(port));
                 socket.receive(packet);
                 String data1 = new String(packet.getData(), 0, packet.getLength());
-                logger.info(data1);
                 String[] data2 = data1.split("#");
-                logger.info("Sequence          "+data2[0]+"    Response         " + data2[1]);
                 String data = unpackJSON(data2[1]);
                 String[] r = responseQueue.get((int)Long.parseLong(data2[0]));
                 if (port == ports[0]) {
                     r[0] = data;
                     responseQueue.replace(Integer.parseInt(data2[0]),r);
-                    //logger.info("RM 1 : " + r[0]);
+                    logger.info("RM 1 : " + r[0]);
                 } else if (port == ports[1]) {
                     r[1] = data;
                     responseQueue.replace(Integer.parseInt(data2[0]),r);
-                    //logger.info("RM 2 : " + r[1]);
+                    logger.info("RM 2 : " + r[1]);
                 } else {
                     r[2] = data;
                     responseQueue.replace(Integer.parseInt(data2[0]),r);
-                  //  logger.info("RM 3 : " + r[2]);
+                    logger.info("RM 3 : " + r[2]);
                 }
             }
         } catch (Exception ex) {

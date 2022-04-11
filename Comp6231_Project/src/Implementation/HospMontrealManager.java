@@ -26,7 +26,7 @@ public class HospMontrealManager {
     public HospMontrealManager(){
         super();
         m_data=new Montreal_Data();
-        setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\MTL\\MTL.txt","MTL");
+        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\MTL\\MTL.txt","MTL");
     }
     public String addAppoint(String id, String appointId, String appointType, String capacity)
     {
