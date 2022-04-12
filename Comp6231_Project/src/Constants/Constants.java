@@ -1,10 +1,10 @@
 package Constants;
 
 public class Constants {
-    public static final String FRONTEND_IP="192.168.2.13";
-    public static final String FAIL_RM1_IP="192.168.2.13";
-    public static final String FAIL_RM2_IP="192.168.2.18";
-    public static final String FAIL_RM3_IP="192.168.2.20";
+    public static final String FRONTEND_IP="192.168.252.68";
+    public static final String FAIL_RM1_IP="192.168.252.109";
+    public static final String FAIL_RM2_IP="192.168.252.219";
+    public static final String FAIL_RM3_IP="192.168.252.68";
     public static final String MULTICAST_IP="224.0.0.252";
     public static final int RM_FRONTEND_PORT=9990;
     public static final int RM1_FRONTEND_PORT=9991;

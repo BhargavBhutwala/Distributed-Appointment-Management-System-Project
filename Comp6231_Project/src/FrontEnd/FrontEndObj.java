@@ -24,7 +24,7 @@ public class FrontEndObj extends FrontEndPOA {
         this.sequencerPort = Constants.SEQUENCER_PORT;
         ports = new int[]{Constants.RM1_FRONTEND_PORT, Constants.RM2_FRONTEND_PORT, Constants.RM3_FRONTEND_PORT};
         fault_Port = Constants.FAULT_PORT;
-        setLogger("C:\\Users\\Dell\\Desktop\\CONCORDIA\\COMP 16\\Distributed-Appointment-Management\\Comp6231_Project\\src\\logs\\FrontEnd.txt", "FrontEnd");
+        setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\FrontEnd.txt", "FrontEnd");
         failures = new int[]{0, 0, 0};
         new Thread(() -> {
             rmResponse(ports[0]);
