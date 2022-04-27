@@ -28,7 +28,7 @@ public class Sherbrook_Server {
 
     public static void main(String[] args) throws Exception{
         Sherbrook_Server sherbrook_server=new Sherbrook_Server();
-        Sherbrook_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\SHE.txt","SHE");
+        Sherbrook_Server.setLogger("\\Comp6231_Project\\src\\logs\\SHE.txt","SHE");
         logger.info("Sherbrooke server started...");
         Runnable stask=()->{
             sherbrook_server.receive();
