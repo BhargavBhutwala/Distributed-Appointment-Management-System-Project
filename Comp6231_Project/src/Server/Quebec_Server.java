@@ -28,7 +28,7 @@ public class Quebec_Server {
 
     public static void main(String[] args) throws Exception{
         Quebec_Server quebec_server=new Quebec_Server();
-        Quebec_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\QUE.txt","QUE");
+        Quebec_Server.setLogger("\\Comp6231_Project\\src\\logs\\QUE.txt","QUE");
         logger.info("Quebec server started...");
         Runnable qtask=()->{
             quebec_server.receive();
