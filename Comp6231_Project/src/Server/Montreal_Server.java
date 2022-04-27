@@ -28,7 +28,7 @@ public class Montreal_Server {
 
     public static void main(String[] args) throws Exception{
         Montreal_Server montreal_server=new Montreal_Server();
-        Montreal_Server.setLogger("C:\\Users\\Bhargav\\OneDrive\\Desktop\\Comp6231_FinalProject\\Comp6231_Project\\src\\logs\\MTL.txt","MTL");
+        Montreal_Server.setLogger("\\Comp6231_Project\\src\\logs\\MTL.txt","MTL");
         logger.info("Montreal server started...");
         Runnable mtask=()->{
             montreal_server.receive();
